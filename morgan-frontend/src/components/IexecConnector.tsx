@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { getDataProtector } from '../lib/iexec';
+import type { ProtectedData } from '@iexec/dataprotector';
 
 declare global {
     interface Window {
@@ -9,24 +10,37 @@ declare global {
 
 export function IexecConnector() {
     const [address, setAddress] = useState('');
-    const [dataSets, setDataSets] = useState<any[]>([]);
+    const [dataSets, setDataSets] = useState<ProtectedData[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const connectWallet = async () => {
-        const [account] = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        setAddress(account);
+        try {
+            setError(null);
+            const [account] = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            setAddress(account);
 
-        const dataProtector = await getDataProtector(window.ethereum);
-        const userProtectedData = await dataProtector.core.getProtectedData();
-        setDataSets(userProtectedData);
+            const dataProtector = await getDataProtector(window.ethereum);
+            const userProtectedData = await dataProtector.core.getProtectedData();
+            setDataSets(userProtectedData);
+        } catch (error: any) {
+            console.error('Failed to connect:', error);
+            setError(error.message || 'Failed to connect wallet');
+        }
     };
 
     const handleProtectData = async () => {
+        if (!input.trim()) {
+            setError('Please enter some data to protect');
+            return;
+        }
+
         setLoading(true);
-        const dataProtector = await getDataProtector(window.ethereum);
+        setError(null);
 
         try {
+            const dataProtector = await getDataProtector(window.ethereum);
             const result = await dataProtector.core.protectData({
                 name: 'Mortgage Info',
                 data: { secretText: input }
@@ -36,8 +50,9 @@ export function IexecConnector() {
             const updated = await dataProtector.core.getProtectedData();
             setDataSets(updated);
             setInput('');
-        } catch (e) {
+        } catch (e: any) {
             console.error('Data protection failed:', e);
+            setError(e.message || 'Failed to protect data');
         }
 
         setLoading(false);
@@ -45,6 +60,12 @@ export function IexecConnector() {
 
     return (
         <div className="space-y-4">
+            {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                    {error}
+                </div>
+            )}
+
             {!address && (
                 <button
                     onClick={connectWallet}
@@ -76,13 +97,21 @@ export function IexecConnector() {
                     </div>
 
                     <h3 className="text-lg mt-6 font-semibold">Protected Datasets:</h3>
-                    <ul className="list-disc pl-5">
+                    <div className="space-y-4">
                         {dataSets.map((data, index) => (
-                            <li key={index}>
-                                {data.name} — {data.schema?.secretText}
-                            </li>
+                            <div key={index} className="border p-4 rounded-lg bg-gray-50">
+                                <h4 className="font-bold">{data.name}</h4>
+                                <div className="mt-2 space-y-1 text-sm">
+                                    <p><span className="font-semibold">Address:</span> {data.address}</p>
+                                    <p><span className="font-semibold">Owner:</span> {data.owner}</p>
+                                    <p><span className="font-semibold">Created:</span> {new Date(data.creationTimestamp * 1000).toLocaleString()}</p>
+                                    <p><span className="font-semibold">Transaction:</span> {data.transactionHash}</p>
+                                    <p><span className="font-semibold">Schema:</span> {JSON.stringify(data.schema)}</p>
+                                    <p><span className="font-semibold">Multiaddr:</span> {data.multiaddr}</p>
+                                </div>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
                 </>
             )}
         </div>
