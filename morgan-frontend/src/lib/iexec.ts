@@ -40,5 +40,14 @@ export async function getDataProtector(ethProvider: any) {
     // Get the signer
     const signer = await provider.getSigner();
 
-    return new IExecDataProtector(signer);
+    // Create a new provider with the correct chain
+    const iexecProvider = new ethers.JsonRpcProvider(IEXEC_RPC);
+
+    // Create a new signer with the correct provider
+    const iexecSigner = new ethers.Wallet(
+        await signer.getAddress(),
+        iexecProvider
+    );
+
+    return new IExecDataProtector(iexecSigner);
 }
