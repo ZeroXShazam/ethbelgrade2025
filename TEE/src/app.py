@@ -35,7 +35,7 @@ try:
     # Get confidential fields
     income = protected_data.getValue('income', 'f64')
     debt = protected_data.getValue('debt', 'f64')
-    credit_score = protected_data.getValue('credit_score', 'i128')
+    credit_score = protected_data.getValue('credit_score', 'f64')
 
     # Compute a simple score (example: debt-to-income ratio + credit score)
     debt_to_income = debt / income
@@ -63,9 +63,8 @@ try:
         json.dump(result, f)
     computed_json = {'deterministic-output-path': IEXEC_OUT + '/result.txt'}
 except Exception as e:
-    print(e)
-    computed_json = {'deterministic-output-path': IEXEC_OUT,
-                     'error-message': 'Oops something went wrong'}
+    print(e)  # Log the error
+    computed_json = {'deterministic-output-path': IEXEC_OUT, 'error-message': str(e)}
 finally:
     with open(IEXEC_OUT + '/computed.json', 'w') as f:
         json.dump(computed_json, f)
