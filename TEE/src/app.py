@@ -32,8 +32,35 @@ try:
 
     print(ascii_art_text)
 
+    # Get confidential fields
+    income = protected_data.getValue('income', 'f64')
+    debt = protected_data.getValue('debt', 'f64')
+    credit_score = protected_data.getValue('credit_score', 'i128')
+
+    # Compute a simple score (example: debt-to-income ratio + credit score)
+    debt_to_income = debt / income
+    score = debt_to_income * (700 - credit_score)
+
+    # Assign level based on score
+    if score < 100:
+        level = "Level A"
+    elif score < 200:
+        level = "Level B"
+    else:
+        level = "Level C"
+
+    result = {
+        "income": income,
+        "debt": debt,
+        "credit_score": credit_score,
+        "debt_to_income": debt_to_income,
+        "score": score,
+        "level": level
+    }
+
+    # Write result
     with open(IEXEC_OUT + '/result.txt', 'w') as f:
-        f.write(ascii_art_text)
+        json.dump(result, f)
     computed_json = {'deterministic-output-path': IEXEC_OUT + '/result.txt'}
 except Exception as e:
     print(e)
