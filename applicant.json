@@ -1,0 +1,30 @@
+{
+  "applicant": {
+    "fullName": "Jane Doe",
+    "passportNumber": "X12345678",
+    "dateOfBirth": "1990-05-15",
+    "phoneNumber": "+1234567890",
+    "email": "jane.doe@example.com"
+  },
+  "employment": {
+    "employer": "Acme Corp",
+    "position": "Software Engineer",
+    "income": 85000,
+    "employmentStartDate": "2018-03-01"
+  },
+  "credit": {
+    "creditScore": 732,
+    "debtToIncomeRatio": 0.25,
+    "existingLoans": [
+      {
+        "type": "student loan",
+        "balance": 12000
+      }
+    ]
+  },
+  "property": {
+    "address": "123 Main St, Metaville",
+    "value": 320000,
+    "loanAmountRequested": 240000
+  }
+}

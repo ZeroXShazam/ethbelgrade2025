@@ -1,5 +1,11 @@
 [
   {
+    "sconifiedImage": "shahryarbhm/morgan:0.0.1-tee-scone-5.9.0-v15-debug-097990365142",
+    "appContractAddress": "0x1dB0d1bD0935d721d8b5d7f5400081bAced17366",
+    "owner": "0xcfe96f096C19da420265A13B99431b22B634fc04",
+    "date": "2025-06-04T23:10:35.580Z"
+  },
+  {
     "sconifiedImage": "shahryarbhm/morgan:0.0.1-tee-scone-5.9.0-v15-debug-2bd43a99f32b",
     "appContractAddress": "0x881b5Dbf8679182604eC6a66ace103b8Adc584fd",
     "owner": "0xcfe96f096C19da420265A13B99431b22B634fc04",

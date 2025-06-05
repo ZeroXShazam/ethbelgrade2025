@@ -1,0 +1,6 @@
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #18181b; /* Tailwind's zinc-900 for a modern dark bg */
+} 
