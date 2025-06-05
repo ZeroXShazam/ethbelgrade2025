@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { IExecDataProtector } from '@iexec/dataprotector';
 
 interface AnalysisRequestProps {
-    dataProtector: IExecDataProtector;
     protectedData: any[];
 }
 
-export function AnalysisRequest({ dataProtector, protectedData }: AnalysisRequestProps) {
+export function AnalysisRequest({ protectedData }: AnalysisRequestProps) {
     const [selectedData, setSelectedData] = useState<string | null>(null);
     const [isRequesting, setIsRequesting] = useState(false);
     const [error, setError] = useState<string | null>(null);

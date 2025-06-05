@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
 import { IExecDataProtector } from '@iexec/dataprotector';
 import { DataProtector } from './components/DataProtector';
 import { AnalysisRequest } from './components/AnalysisRequest';
 import { getDataProtector, getProtectedData } from './lib/iexec';
+import { IexecConnector } from './components/IexecConnector';
 
 type Page = 'upload' | 'analyze';
 
@@ -14,7 +14,6 @@ function App() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [myProtectedData, setMyProtectedData] = useState<any[]>([]);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>('upload');
 
   // Check if wallet is already connected on mount
@@ -72,19 +71,16 @@ function App() {
     if (!dataProtector || !account) return;
 
     try {
-      setIsRefreshing(true);
       const data = await getProtectedData(dataProtector, account);
       setMyProtectedData(data);
     } catch (error: any) {
       console.error('Failed to fetch protected data:', error);
       setError(error.message || 'Failed to fetch protected data');
-    } finally {
-      setIsRefreshing(false);
     }
   };
 
   // Handle new protected data
-  const handleDataProtected = async (newData: any) => {
+  const handleDataProtected = async () => {
     if (dataProtector && account) {
       await fetchMyProtectedData(dataProtector, account);
     }
@@ -113,63 +109,26 @@ function App() {
     }
   }, [account]);
 
+  const handleConnect = async () => {
+    await connectWallet();
+  };
+
   const renderPage = () => {
-    if (!account || !dataProtector) return null;
+    if (!account) {
+      return <IexecConnector onConnect={handleConnect} />;
+    }
+
+    if (!dataProtector) {
+      return null;
+    }
 
     switch (currentPage) {
       case 'upload':
-        return (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6">
-              <h2 className="text-2xl font-semibold mb-4">Upload Protected Data</h2>
-              <DataProtector
-                dataProtector={dataProtector}
-                onDataProtected={handleDataProtected}
-              />
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-semibold">Your Protected Data</h2>
-                <button
-                  onClick={() => fetchMyProtectedData(dataProtector, account)}
-                  disabled={isRefreshing}
-                  className="text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  {isRefreshing ? 'Refreshing...' : 'Refresh'}
-                </button>
-              </div>
-              {myProtectedData.length === 0 ? (
-                <p className="text-gray-300">No protected data found.</p>
-              ) : (
-                <ul className="space-y-2">
-                  {myProtectedData.map((data, idx) => (
-                    <li key={idx} className="bg-white/5 rounded-lg p-4">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-medium">{data.name}</span>
-                        <span className="text-xs text-gray-400">
-                          {data.address.slice(0, 6)}...{data.address.slice(-4)}
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        Created: {new Date(data.creationTimestamp * 1000).toLocaleString()}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-        );
+        return <DataProtector dataProtector={dataProtector} onDataProtected={handleDataProtected} />;
       case 'analyze':
-        return (
-          <div className="max-w-2xl mx-auto">
-            <AnalysisRequest
-              dataProtector={dataProtector}
-              protectedData={myProtectedData}
-            />
-          </div>
-        );
+        return <AnalysisRequest protectedData={myProtectedData} />;
+      default:
+        return null;
     }
   };
 
