@@ -1,5 +1,6 @@
 {
   "income": 50000,
   "debt": 10000,
-  "credit_score": 650
+  "credit_score": 650,
+  "sectretKey": "12345-ABCDE"
 }

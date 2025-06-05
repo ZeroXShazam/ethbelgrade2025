@@ -4,8 +4,9 @@ import { DataProtector } from './components/DataProtector';
 import { AnalysisRequest } from './components/AnalysisRequest';
 import { getDataProtector, getProtectedData } from './lib/iexec';
 import { IexecConnector } from './components/IexecConnector';
+import { TEETask } from './components/TEETask';
 
-type Page = 'upload' | 'analyze';
+type Page = 'upload' | 'analyze' | 'tee';
 
 function App() {
   const [account, setAccount] = useState<string | null>(null);
@@ -127,6 +128,8 @@ function App() {
         return <DataProtector dataProtector={dataProtector} onDataProtected={handleDataProtected} />;
       case 'analyze':
         return <AnalysisRequest protectedData={myProtectedData} />;
+      case 'tee':
+        return <TEETask dataProtector={dataProtector} protectedData={myProtectedData} />;
       default:
         return null;
     }
@@ -160,6 +163,15 @@ function App() {
                       }`}
                   >
                     Request Analysis
+                  </button>
+                  <button
+                    onClick={() => setCurrentPage('tee')}
+                    className={`px-3 py-2 rounded-lg transition-colors ${currentPage === 'tee'
+                      ? 'bg-white/10 text-white'
+                      : 'text-gray-300 hover:text-white'
+                      }`}
+                  >
+                    TEE Analysis
                   </button>
                 </div>
               )}
